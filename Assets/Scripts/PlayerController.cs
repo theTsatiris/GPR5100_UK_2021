@@ -1,11 +1,15 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     public float speed;
+    public float rotationSensitivity;
+    public TMP_Text name;
+    public GameObject FPSCamera;
 
     private PhotonView view;
 
@@ -13,6 +17,11 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         view = GetComponent<PhotonView>();
+        name.text = view.Owner.NickName;
+        if(!view.IsMine)
+        {
+            FPSCamera.GetComponent<Camera>().enabled = false;
+        }
     }
 
     // Update is called once per frame
@@ -22,24 +31,28 @@ public class PlayerController : MonoBehaviour
         { 
             if(Input.GetKey("w"))
             {
-                Vector3 movement = new Vector3(0.0f, 0.0f, speed * Time.deltaTime);
-                transform.position += movement;
+                transform.position += transform.forward * speed * Time.deltaTime;
             }
             if (Input.GetKey("s"))
             {
-                Vector3 movement = new Vector3(0.0f, 0.0f, -speed * Time.deltaTime);
-                transform.position += movement;
+                transform.position -= transform.forward * speed * Time.deltaTime;
             }
             if (Input.GetKey("a"))
             {
-                Vector3 movement = new Vector3(-speed * Time.deltaTime, 0.0f, 0.0f);
-                transform.position += movement;
+                transform.position -= transform.right * speed * Time.deltaTime;
             }
             if (Input.GetKey("d"))
             {
-                Vector3 movement = new Vector3(speed * Time.deltaTime, 0.0f, 0.0f);
-                transform.position += movement;
+                transform.position += transform.right * speed * Time.deltaTime;
             }
+
+            float rotation_Y = Input.GetAxis("Mouse X");
+            Vector3 rotationVectorY = new Vector3(0.0f, rotation_Y, 0.0f) * rotationSensitivity;
+
+            Vector3 currRotation = transform.rotation.eulerAngles;
+            Vector3 finalRotation = currRotation + rotationVectorY;
+
+            transform.rotation = Quaternion.Euler(finalRotation);
         }
     }
 }

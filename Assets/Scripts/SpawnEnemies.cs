@@ -8,12 +8,15 @@ public class SpawnEnemies : MonoBehaviour
     public GameObject enemy;
     public float maxSpawnInterval;
     public Transform[] spawningPoints;
+    public int maxEnemies;
 
     float timeBetweenSpawns;
+    int numOfEnemies;
     
     // Start is called before the first frame update
     void Start()
     {
+        numOfEnemies = 0;
         timeBetweenSpawns = maxSpawnInterval;
     }
 
@@ -24,10 +27,14 @@ public class SpawnEnemies : MonoBehaviour
         { 
             if(timeBetweenSpawns <= 0.0f)
             {
-                int randIndx = Random.Range(0, spawningPoints.Length);
-                Vector3 randomSpawnPos = spawningPoints[randIndx].position;
-                PhotonNetwork.Instantiate(enemy.name, randomSpawnPos, Quaternion.identity);
-                timeBetweenSpawns = maxSpawnInterval;
+                if(numOfEnemies < maxEnemies)
+                {
+                    int randIndx = Random.Range(0, spawningPoints.Length);
+                    Vector3 randomSpawnPos = spawningPoints[randIndx].position;
+                    PhotonNetwork.Instantiate(enemy.name, randomSpawnPos, Quaternion.identity);
+                    numOfEnemies++;
+                    timeBetweenSpawns = maxSpawnInterval;
+                }
             }
             else
             {
