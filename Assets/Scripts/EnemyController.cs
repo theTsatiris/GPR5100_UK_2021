@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class EnemyController : MonoBehaviour
 {
@@ -32,6 +33,24 @@ public class EnemyController : MonoBehaviour
         if(nearestPlayer != null)
         { 
             transform.position = Vector3.MoveTowards(transform.position, nearestPlayer.transform.position, speed * Time.deltaTime);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("Player"))
+        {
+            collision.gameObject.GetComponent<PhotonView>().RPC("TakeDamage", RpcTarget.AllBuffered, 5.0f);
+        }
+    }
+
+    [PunRPC]
+    public void Die()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            SpawnEnemies.numOfEnemies--;
+            PhotonNetwork.Destroy(this.gameObject);
         }
     }
 }

@@ -11,7 +11,13 @@ public class RoomManagement : MonoBehaviourPunCallbacks
     public InputField createInput;
     public InputField joinInput;
     public InputField nickName;
-    
+
+    public void Start()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
     public void CreateRoom()
     {
         if(!string.IsNullOrEmpty(createInput.text) && (createInput.text != "Room Name"))

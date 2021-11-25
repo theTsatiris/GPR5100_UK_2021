@@ -11,7 +11,7 @@ public class SpawnEnemies : MonoBehaviour
     public int maxEnemies;
 
     float timeBetweenSpawns;
-    int numOfEnemies;
+    public static int numOfEnemies;
     
     // Start is called before the first frame update
     void Start()
