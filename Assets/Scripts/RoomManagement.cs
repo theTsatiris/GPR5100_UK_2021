@@ -8,8 +8,10 @@ using UnityEngine.SceneManagement;
 
 public class RoomManagement : MonoBehaviourPunCallbacks
 {
+    public static byte MAX_PLAYERS = 50;
+
     public InputField createInput;
-    public InputField joinInput;
+    public InputField playerNum;
     public InputField nickName;
 
     public void Start()
@@ -24,12 +26,21 @@ public class RoomManagement : MonoBehaviourPunCallbacks
         { 
             if(NickNameIsValid())
             {
-                PhotonNetwork.NickName = nickName.text;
-                RoomOptions rOptions = new RoomOptions();
-                rOptions.IsOpen = true;
-                rOptions.IsVisible = true;
-                rOptions.MaxPlayers = 2;
-                PhotonNetwork.CreateRoom(createInput.text, rOptions);
+                byte playerNumber;
+                if(!string.IsNullOrEmpty(playerNum.text) && byte.TryParse(playerNum.text, out playerNumber))
+                { 
+                    PhotonNetwork.NickName = nickName.text;
+                    RoomOptions rOptions = new RoomOptions();
+                    rOptions.IsOpen = true;
+                    rOptions.IsVisible = true;
+                    if (playerNumber > MAX_PLAYERS)
+                        rOptions.MaxPlayers = MAX_PLAYERS;
+                    else if (playerNumber < 2)
+                        rOptions.MaxPlayers = 2;
+                    else
+                        rOptions.MaxPlayers = playerNumber;
+                    PhotonNetwork.CreateRoom(createInput.text, rOptions);
+                }
             }
             else
             {
@@ -44,7 +55,13 @@ public class RoomManagement : MonoBehaviourPunCallbacks
 
     public void JoinRoom()
     {
-        if ((joinInput.text != "") && (joinInput.text != "Room Name"))
+        if (NickNameIsValid())
+        {
+            PhotonNetwork.NickName = nickName.text;
+            PhotonNetwork.LoadLevel("RoomListScene");
+        }
+
+        /*if ((joinInput.text != "") && (joinInput.text != "Room Name"))
         {
             if (NickNameIsValid())
             {
@@ -59,7 +76,7 @@ public class RoomManagement : MonoBehaviourPunCallbacks
         else
         {
             Debug.Log("Please type a valid room name!!");
-        }
+        }*/
     }
 
     public void JoinRandom()
@@ -67,13 +84,7 @@ public class RoomManagement : MonoBehaviourPunCallbacks
         if (NickNameIsValid())
         {
             PhotonNetwork.NickName = nickName.text;
-            RoomOptions rOptions = new RoomOptions();
-            rOptions.IsOpen = true;
-            rOptions.IsVisible = true;
-            rOptions.MaxPlayers = 2;
-
-            string roomName = "Room" + Random.Range(0, 100000);
-            PhotonNetwork.CreateRoom(roomName, rOptions);
+            PhotonNetwork.JoinRandomRoom();
         }
         else
         {
@@ -99,6 +110,17 @@ public class RoomManagement : MonoBehaviourPunCallbacks
     {
         base.OnJoinRoomFailed(returnCode, message);
         Debug.Log("ERROR! Failed to join room!");
+    }
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        RoomOptions rOptions = new RoomOptions();
+        rOptions.IsOpen = true;
+        rOptions.IsVisible = true;
+        rOptions.MaxPlayers = (byte)Random.Range(2, MAX_PLAYERS);
+
+        string roomName = "Room" + Random.Range(0, 100000);
+        PhotonNetwork.CreateRoom(roomName, rOptions);   
     }
 
     private bool NickNameIsValid()
