@@ -60,23 +60,6 @@ public class RoomManagement : MonoBehaviourPunCallbacks
             PhotonNetwork.NickName = nickName.text;
             PhotonNetwork.LoadLevel("RoomListScene");
         }
-
-        /*if ((joinInput.text != "") && (joinInput.text != "Room Name"))
-        {
-            if (NickNameIsValid())
-            {
-                PhotonNetwork.NickName = nickName.text;
-                PhotonNetwork.JoinRoom(joinInput.text);
-            }
-            else
-            {
-                Debug.Log("Please type a valid nickname!!");
-            }
-        }
-        else
-        {
-            Debug.Log("Please type a valid room name!!");
-        }*/
     }
 
     public void JoinRandom()
